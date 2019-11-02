@@ -1,0 +1,47 @@
+TITLE 0809-2
+; N1*N2-(N3+N4)
+; THE RESULT IS AT MOST 2 DIGITS WIDE
+CODESEG SEGMENT
+    ASSUME CS:CODESEG, DS:DATASEG
+    START:
+        MOV DX, DATASEG ; INITIALIZE DS REGISTER TO POINT TO DATASEG
+        MOV DS, DX      ;
+        MOV DX, 0       ;
+        
+        LEA DX, MESSAGE ; PRINT MESSAGE TO STDOUT
+        MOV AH, 9       ;
+        INT 21H         ;
+        
+        MOV AL, N1 ; DO N1*N2-N3-N4
+        MOV AH, N2 ;
+        MUL AH     ; 
+        SUB AL, N3 ;
+        SUB AL, N4 ;
+                    
+        MOV BH, 10 ; USE BH AS DIVISOR
+        DIV BH     ; COMPUTE RESULT'S TENS
+        MOV BL, AH ; CACHE REMAINDER IN BL
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTER
+        ADD DL, AL ;
+        MOV AH, 2  ; PRINT TENS TO STDOUT
+        INT 21H    ;
+        
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTER
+        ADD DL, BL ; ADD CACHED REMAINDER FROM PREVIOUS COMPUTATION
+        INT 21H    ; PRINT IT
+        
+        MOV AH, 4CH ; EXIT PROGRAM
+        INT 21H     ;
+
+CODESEG ENDS
+
+DATASEG SEGMENT
+    
+    N1 DB 5
+    N2 DB 7
+    N3 DB 5
+    N4 DB 11
+    MESSAGE DB "THE RESULT IS: $"
+    
+DATASEG ENDS
+    END START
