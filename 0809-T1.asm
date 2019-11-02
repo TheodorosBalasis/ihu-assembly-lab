@@ -1,21 +1,15 @@
 TITLE 0809-T1
 ; CALCULATE (N1+N2)*(N3-N4)
+; RESULT MAY BE UP TO 3 DIGITS WIDE
 CODESEG SEGMENT
     ASSUME CS:CODESEG, DS:DATASEG                    
-    START:
-        ; -------------------FOREWORD----------------------
-        ; APPARENTLY DOS INTERRUPTS BEHAVE ACCORDING TO THE
-        ; CONTENTS OF AH, TABLE CAN BE FOUND HERE
-        ; https://spike.scu.edu.au/~barry/interrupts.html
-        ; 21H IS THE DOS INTERRUPT (INT 21H)
-        
-        MOV DX, DATASEG ; LOAD ADDRESS OF DATA SEGMENT TO DS
-        MOV DS, DX      ;
-        MOV DX, 0000H   ;
+    START:      
+        MOV DX, DATASEG ; 
+        MOV DS, DX      ; LOAD ADDRESS OF DATA SEGMENT TO DS
+        MOV DX, 0       ;
         
         LEA DX, MESSAGE ; LOAD MESSAGE ADDRESS TO DX
-        MOV AH, 09H     ; "WRITE STRING TO STDOUT" INTERRUPT
-                        ; READS ADDRESS FROM DX.
+        MOV AH, 09H     ; PRINT MESSAGE STRING TO STDOUT
         INT 21H         ;
         
  
@@ -25,38 +19,36 @@ CODESEG SEGMENT
         SUB AH, N4 ;
         
         
-        MUL AH      ; BECAUSE OPERAND IS BYTE, STORES RESULT IN AX
-        MOV BX, 0   ; ZERO OUT BX REGISTER
-        MOV BH, 100 ; USE FOR DIVISION
+        MUL AH ; AX = AL * AH
+               ; BECAUSE OPERAND IS BYTE, STORES RESULT IN AX           
         
-        DIV BH     ; GET NUMBER'S HUNDREDS
-        MOV DL, 48 ; ASCII NUMS START AT 48 
-        ADD DL, AL ; STORE RESULT IN DL FOR PRINTING
+        MOV BH, 100 ; USE BH AS DIVISOR                                                                        
+        
+        DIV BH     ; GET NUMBER'S HUNDREDS. AH = AX % BH, AL = AX / BH 
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL ; STORE RESULT IN DL FOR PRINTING        
         MOV BL, AH ; STORE REMAINDER IN BL TO DIVIDE AGAIN
-                   ; PRINT INTERRUPT STORES OUTPUT CHAR IN AL
-                   ; SO AL CANNOT BE USED TO STORE REMAINDER
-        MOV AH, 2  ; "PRINT CHAR TO STDOUT" INTERRUPT
-                   ; CHARACTER IS READ FROM DL
+        MOV AH, 2  ; PRINT DL TO STDOUT
         INT 21H    ;
-        MOV AH, 0  ; ZERO OUT AH TO AVOID CORRUPTING THE RESULT
+        
+        MOV AH, 0  ; ZERO OUT AH FOR NEXT DIVISION
         MOV BH, 10 ;
-        MOV AL, BL ;
+        MOV AL, BL ; GET PREVIOUS REMAINDER FROM BL
         
-        DIV BH     ; REPEAT FOR NUMBER'S TENS
-        MOV DL, 48 ;
-        ADD DL, AL ;            
-        MOV BL, AH ;            
-        MOV AH, 2  ; PRINT INTERRUPT           
+        DIV BH     ; GET NUMBER'S TENS
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL ; STORE RESULT IN DL FOR PRINTING            
+        MOV BL, AH ; STORE REMAINDER IN BL           
+        MOV AH, 2  ; PRINT DL TO STDOUT          
         INT 21H    ;            
-        MOV AH, 0  ;
         
-        MOV DL, 48 ;
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
         ADD DL, BL ; REMAINDER IS NUMBER'S ONES
-        MOV AH, 2  ; PRINT INTERRUPT
+        MOV AH, 2  ; PRINT DL TO STDOUT
         INT 21H    ;
         
         
-        MOV AH, 4CH ; "EXIT PROGRAM" INTERRUPT
+        MOV AH, 4CH ; EXIT PROGRAM
         INT 21H     ;
                    
     
