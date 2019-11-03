@@ -1,0 +1,43 @@
+TITLE 1011-1
+; (X-2)^2
+; X IS A SINGLE DIGIT NUMBER, THUS THE RESULT IS AT MOST 2 DIGITS WIDE 
+CODESEG SEGMENT
+    ASSUME CS:CODESEG, DS:DATASEG
+    START:
+        MOV DX, DATASEG ; INITIALIZE DS TO POINT TO DATASEG
+        MOV DS, DX      ;
+        MOV DX, 0       ;
+        
+        LEA DX, MESSAGE ; PRINT MESSAGE TO STDOUT
+        MOV AH, 9       ;
+        INT 21H         ;
+        MOV AH, 0       ; CLEAR AH
+        
+        MOV AL, X ; PERFORM EXERCISE COMPUTATION
+        SUB AL, 2 ;
+        MUL AL    ;
+        
+        MOV DH, 10 ; USE DH AS DIVISOR
+        DIV DH     ; GET NUMBER'S TENS
+        MOV DH, AH ; CACHE REMAINDER IN DH
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL ;
+        MOV AH, 2  ; PRINT TO STDOUT
+        INT 21H    ;
+        
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, DH ;
+        INT 21H    ; PRINT TO STDOUT
+        
+        MOV AH, 4CH ; EXIT PROGRAM
+        INT 21H     ;  
+        
+CODESEG ENDS
+
+DATASEG SEGMENT
+    
+    X DB 9
+    MESSAGE DB "THE RESULT IS: $"
+    
+DATASEG ENDS
+    END START
