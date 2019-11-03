@@ -1,0 +1,56 @@
+TITLE 0910-2
+; 2N^2 - 3N + 5
+; N IS A SINGLE DIGIT NUMBER, THUS THE RESULT IS AT MOST 3 DIGITS WIDE
+CODESEG SEGMENT
+    ASSUME CS:CODESEG, DS:DATASEG
+    START:
+        MOV DX, DATASEG ; INITIALIZE DS TO POINT TO DATASEG
+        MOV DS, DX      ;
+        MOV DX, 0       ;
+        
+        LEA DX, MESSAGE ; PRINT MESSAGE TO STDOUT
+        MOV AH, 9       ;
+        INT 21H         ;
+        
+        MOV AL, N  ; PERFORM EXERCISE COMPUTATION
+        MUL AL     ;
+        ADD AL, AL ;
+        SUB AL, N  ;
+        SUB AL, N  ;
+        SUB AL, N  ;
+        ADD AL, 5  ;
+        
+        MOV BL, 100 ; USE BL AS DIVISOR
+        DIV BL      ; GET NUMBER'S HUNDREDS
+        MOV BH, AH  ; CACHE REMAINDER IN BH
+        MOV DL, 48  ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL  ;
+        MOV AH, 2   ; PRINT TO STDOUT
+        INT 21H     ;
+        MOV AH, 0   ; SET AX TO BE THE REMAINDER OF THE LAST DIVISION
+        MOV AL, BH  ;
+        
+        MOV BL, 10 ; USE BL AS DIVISOR
+        DIV BL     ; GET NUMBER'S TENS
+        MOV BH, AH ; CACHE REMAINDER IN BH
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL ;
+        MOV AH, 2  ; PRINT TO STDOUT
+        INT 21H    ;
+        
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, BH ; LAST REMAINDER IS NUMBER'S UNITS
+        INT 21H    ; PRINT TO STDOUT
+        
+        MOV AH, 4CH ; EXIT PROGRAM
+        INT 21H     ;   
+    
+CODESEG ENDS
+
+DATASEG SEGMENT
+    
+    N DB 9
+    MESSAGE DB "THE RESULT IS: $"    
+    
+DATASEG ENDS
+    END START
