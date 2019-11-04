@@ -1,0 +1,44 @@
+TITLE EXERCISE-1
+; N^2 - 2N + 1
+; N IS A SINGLE DIGIT NUMBER, THUS THE RESULT IS AT MOST 2 DIGITS WIDE
+CODESEG SEGMENT
+    ASSUME CS:CODESEG, DS:DATASEG
+    START:
+        MOV DX, DATASEG ; INITIALIZE DS TO POINT TO DATASEG
+        MOV DS, DX      ;
+        MOV DX, 0       ;
+        
+        LEA DX, MESSAGE ; PRINT MESSAGE TO STDOUT
+        MOV AH, 9       ;
+        INT 21H         ;
+        
+        MOV AL, N ; PERFORM EXERCISE COMPUTATION
+        MUL AL    ;
+        SUB AL, N ;
+        SUB AL, N ;
+        ADD AL, 1 ;
+        
+        MOV DL, 10 ; USE DL AS DIVISOR
+        DIV DL     ; GET NUMBER'S TENS
+        MOV DH, AH ; CACHE REMAINDER IN DH
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL ;
+        MOV AH, 2  ; PRINT RESULT TO STDOUT
+        INT 21H    ;
+        
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, DH ;
+        INT 21H    ; PRINT RESULT TO STDOUT
+        
+        MOV AH, 4CH ; EXIT PROGRAM
+        INT 21H     ;
+    
+CODESEG ENDS
+
+DATASEG SEGMENT
+    
+    N DB 9
+    MESSAGE DB "THE RESULT IS: $"
+    
+DATASEG ENDS
+    END START
