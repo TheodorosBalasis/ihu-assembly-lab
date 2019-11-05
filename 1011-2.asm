@@ -1,0 +1,44 @@
+TITLE 1011-2
+; (N-1)^2 - 2(N+3)
+; N IS A SINGLE DIGIT NUMBER, THUS THE RESULT IS AT MOST 2 DIGITS WIDE
+CODESEG SEGMENT
+    ASSUME CS:CODESEG, DS:DATASEG
+    START:
+        MOV DX, DATASEG ; INITIALIZE DS TO POINT TO DATASEG
+        MOV DS, DX      ;
+        
+        LEA DX, MESSAGE ; PRINT MESSAGE TO STDOUT
+        MOV AH, 9       ;
+        INT 21H         ;
+        
+        MOV AL, N ; PERFORM EXERCISE COMPUTATION
+        SUB AL, 1 ;
+        MUL AL    ;
+        SUB AL, N ;
+        SUB AL, N ;
+        SUB AL, 6 ;
+        
+        MOV DL, 10 ; USE DL AS DIVISOR
+        DIV DL     ; GET NUMBER'S TENS
+        MOV DH, AH ; CACHE THE REMAINDER
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, AL ;                                             
+        MOV AH, 2  ; PRINT TO STDOUT
+        INT 21H    ;
+        
+        MOV DL, 48 ; INITIALIZE DL FOR PRINTING NUMERIC CHARACTERS
+        ADD DL, DH ; LAST REMAINDER IS NUMBER'S UNITS
+        INT 21H    ; PRINT TO STDOUT
+        
+        MOV AH, 4CH ; EXIT PROGRAM
+        INT 21H     ;
+    
+CODESEG ENDS
+
+DATASEG SEGMENT
+    
+    N DB 9
+    MESSAGE DB "THE RESULT IS: $"
+    
+DATASEG ENDS
+    END START
